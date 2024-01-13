@@ -58,6 +58,18 @@ namespace PokemonReviewApp.Repository
 
         }
 
+        public bool UpdatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        {
+            context.Update(pokemon);
+            return Save();
+        }
+
+        public bool DeletePokemon(Pokemon pokemon)
+        {
+            context.Remove(pokemon);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = context.SaveChanges();

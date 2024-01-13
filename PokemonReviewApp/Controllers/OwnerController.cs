@@ -70,5 +70,51 @@ namespace PokemonReviewApp.Controllers
             }
             return Ok("Successfully created");
         }
+
+        [HttpPut("{ownerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateOwner(int ownerId, [FromBody] OwnerDto ownerUpdate)
+        {
+            if (ownerUpdate == null) return BadRequest(ModelState);
+
+            if (ownerId != ownerUpdate.Id) return BadRequest(ModelState);
+
+            if (!ownerRepository.OwnerExists(ownerId)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var ownerMap = mapper.Map<Owner>(ownerUpdate);
+
+            if (!ownerRepository.UpdateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating {ownerUpdate.FirstName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{ownerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteOwner(int countryId)
+        {
+            if (!ownerRepository.OwnerExists(countryId)) return NotFound();
+
+            var ownerToDelete = ownerRepository.GetOwner(countryId);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!ownerRepository.DeleteOwner(ownerToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {ownerToDelete.FirstName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

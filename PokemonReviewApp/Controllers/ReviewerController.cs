@@ -68,5 +68,51 @@ namespace PokemonReviewApp.Controllers
             }
             return Ok("Successfully created");
         }
+
+        [HttpPut("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateOwner(int reviewerId, [FromBody] ReviewerDto reviewerUpdate)
+        {
+            if (reviewerUpdate == null) return BadRequest(ModelState);
+
+            if (reviewerId != reviewerUpdate.Id) return BadRequest(ModelState);
+
+            if (!reviewerRepository.ReviewerExists(reviewerId)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var reviewerMap = mapper.Map<Reviewer>(reviewerUpdate);
+
+            if (!reviewerRepository.UpdateReviewer(reviewerMap))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating {reviewerUpdate.FirstName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!reviewerRepository.ReviewerExists(reviewerId)) return NotFound();
+
+            var reviewToDelete = reviewerRepository.GetReviewer(reviewerId);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!reviewerRepository.DeleteReviewer(reviewToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {reviewToDelete.FirstName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

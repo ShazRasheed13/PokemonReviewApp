@@ -33,6 +33,18 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
+        public bool UpdateReviewer(Reviewer reviewer)
+        {
+            context.Update(reviewer);
+            return Save();
+        }
+
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            context.Remove(reviewer);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = context.SaveChanges();

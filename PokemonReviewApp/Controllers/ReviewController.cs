@@ -77,6 +77,52 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully created");
         }
 
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateReview(int reviewId, [FromBody] ReviewDto reviewUpdate)
+        {
+            if (reviewUpdate == null) return BadRequest(ModelState);
+
+            if (reviewId != reviewUpdate.Id) return BadRequest(ModelState);
+
+            if (!reviewRepository.ReviewExists(reviewId)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var reviewMap = mapper.Map<Review>(reviewUpdate);
+
+            if (!reviewRepository.UpdateReview(reviewMap))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating {reviewUpdate.Title}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!reviewRepository.ReviewExists(reviewId)) return NotFound();
+
+            var reviewToDelete = reviewRepository.GetReview(reviewId);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!reviewRepository.DeleteReview(reviewToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {reviewToDelete.Title}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
     }
 
 
