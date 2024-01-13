@@ -52,11 +52,12 @@ namespace PokemonReviewApp.Controllers
             if (pokemonCreate == null)
                 return BadRequest(ModelState);
 
-            var pokemons = pokemonRepository.GetPokemonTrimToUpper(pokemonCreate);
+            var pokemons = pokemonRepository.GetPokemons()
+                .FirstOrDefault(c => c.Name.Trim().ToUpper() == pokemonCreate.Name.TrimEnd().ToUpper());
 
             if (pokemons != null)
             {
-                ModelState.AddModelError("", "Owner already exists");
+                ModelState.AddModelError("", "pokemon already exists");
                 return StatusCode(422, ModelState);
             }
 

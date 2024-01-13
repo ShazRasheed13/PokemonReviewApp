@@ -26,5 +26,17 @@ namespace PokemonReviewApp.Repository
         {
             return context.Reviewer.Any(r => r.Id == reviewerId);
         }
+
+        public bool CreateReviewer(Reviewer reviewer)
+        {
+            context.Add(reviewer);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = context.SaveChanges();
+            return saved >= 0 ? true : false;
+        }
     }
 }
